@@ -20,8 +20,8 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
     ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}
 
-    ADMIN_EMAIL    = os.environ.get('ADMIN_EMAIL', 'admin@careerhub.com')
-    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
+    ADMIN_EMAIL    = os.environ.get('ADMIN_EMAIL')
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
 
     # Optional Gmail SMTP
     MAIL_SERVER   = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')

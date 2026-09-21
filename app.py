@@ -15,6 +15,9 @@ from models.student import Student
 from models.organization import Organization
 from models.opportunity import Opportunity
 from models.application import Application
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 # App factory
