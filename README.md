@@ -134,10 +134,14 @@ Then open **http://127.0.0.1:5000**
 ## 5. Using the Application
 
 ### 5.1 Admin login
-Go to the footer link **Admin Portal** (or `/admin/login`) and sign in with:
-```
-Email:    admin@careerhub.com
-Password: admin123
+
+Go to the footer link **Admin Portal** (or `/admin/login`) and sign in using the admin credentials configured through the `ADMIN_EMAIL` and `ADMIN_PASSWORD` environment variables.
+
+For local development, set them in your `.env` file:
+
+```bash
+ADMIN_EMAIL=your-admin-email
+ADMIN_PASSWORD=your-strong-password
 ```
 > Change these via the `ADMIN_EMAIL` / `ADMIN_PASSWORD` environment variables before any real deployment.
 
@@ -146,7 +150,6 @@ Register → complete your profile (skills, education, experience, resume) → b
 
 ### 5.3 Organization flow
 Register with an optional verification document → wait for admin approval (status starts `Pending`) → once `Verified`, post vacancies, manage them, and review/accept/reject applicants from **Applicants**.
-
 ### 5.4 Admin verification
 Log in as admin → **Organizations** → open a pending organization → **Verify** or **Reject** (with an optional note). Only verified organizations can post vacancies.
 
@@ -159,8 +162,7 @@ All configuration lives in `config.py` and can be overridden with environment va
 ```bash
 export SECRET_KEY="change-me-in-production"
 export DATABASE_URL="mysql+pymysql://user:pass@localhost:3306/careerhub"   # or leave unset for SQLite
-export ADMIN_EMAIL="your-admin-email"
-export ADMIN_PASSWORD="your-strong-password"
+
 # Optional Gmail SMTP — applications submit fine without this
 
 ```
