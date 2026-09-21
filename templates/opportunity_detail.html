@@ -1,0 +1,75 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}{{ opportunity.title }} — CareerHub{% endblock %}
+{% block app_content %}
+{% set expired = is_expired(opportunity) %}
+
+<div class="page-header" style="margin-bottom:20px;">
+  <a href="{{ url_for('opportunities') }}" class="btn btn-outline btn-sm">{{ icons.icon('chevron-left',15) }} Back to Vacancies</a>
+</div>
+
+{% if expired %}
+  <div class="expired-banner">{{ icons.icon('alert',18) }} This vacancy's deadline has passed and it is no longer accepting new applications.</div>
+{% endif %}
+
+<div class="card detail-card animate-in">
+  <div class="detail-header">
+    <div>
+      <span class="badge badge-type">{{ opportunity.opportunity_type }}</span>
+      <h1 class="detail-title">{{ opportunity.title }}</h1>
+      <p class="detail-org">{{ opportunity.organization.organization_name }}</p>
+    </div>
+    <div class="match-circle {% if match_pct >= 80 %}match-high{% elif match_pct >= 60 %}match-med{% else %}match-low{% endif %}">
+      <span class="match-circle-val">{{ match_pct }}%</span>
+      <span class="match-circle-label">match</span>
+    </div>
+  </div>
+
+  <div class="detail-meta-row">
+    <span class="detail-meta-item">{{ icons.icon('location',16) }} {{ opportunity.location or 'N/A' }}</span>
+    {% if opportunity.salary %}<span class="detail-meta-item">{{ icons.icon('money',16) }} {{ opportunity.salary }}</span>{% endif %}
+    <span class="detail-meta-item">{{ icons.icon('trending',16) }} {{ opportunity.experience_required or 0 }} yr(s) experience</span>
+    {% if opportunity.deadline %}
+      <span class="detail-meta-item">{{ icons.icon('calendar',16) }} Deadline: {{ opportunity.deadline.strftime('%d %B %Y') }}</span>
+    {% endif %}
+    <span class="detail-meta-item">{{ icons.icon('clock',16) }} Posted {{ opportunity.created_at.strftime('%d %B %Y') }}</span>
+  </div>
+
+  <div class="detail-section">
+    <h2>Description</h2>
+    <p class="detail-description">{{ opportunity.description }}</p>
+  </div>
+
+  {% if opportunity.required_skills %}
+    <div class="detail-section">
+      <h2>Required Skills</h2>
+      <div class="skill-tags">
+        {% for skill in opportunity.required_skills.split(',') %}{% if skill.strip() %}<span class="skill-tag">{{ skill.strip() }}</span>{% endif %}{% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="detail-section org-info-card">
+    <div class="table-avatar">{{ opportunity.organization.organization_name[0]|upper }}</div>
+    <div>
+      <div style="font-weight:700;">{{ opportunity.organization.organization_name }}</div>
+      <div style="font-size:.82rem; color:var(--text-faint);">{{ opportunity.organization.address or 'Address not provided' }}</div>
+    </div>
+  </div>
+
+  <div class="detail-actions">
+    {% if applied %}
+      <span class="btn btn-disabled">{{ icons.icon('check',17) }} Application Submitted</span>
+      <span class="badge badge-status badge-{{ applied.status.lower() }} badge-lg">{{ applied.status }}</span>
+    {% elif expired %}
+      <span class="btn btn-disabled btn-lg">Applications Closed</span>
+    {% else %}
+      <form method="POST" action="{{ url_for('apply_opportunity', opportunity_id=opportunity.opportunity_id) }}">
+        <button type="submit" class="btn btn-primary btn-lg">{{ icons.icon('send',17) }} Apply Now</button>
+      </form>
+    {% endif %}
+    <a href="{{ url_for('opportunities') }}" class="btn btn-outline">Browse More</a>
+  </div>
+</div>
+
+{% endblock %}

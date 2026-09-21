@@ -1,0 +1,153 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Dashboard — CareerHub{% endblock %}
+{% block app_content %}
+
+<div class="app-welcome-banner animate-in">
+  <div class="welcome-icon">{{ icons.icon('trending', 80) }}</div>
+  <h1>Welcome back, {{ student.full_name.split(' ')[0] }}! {{ icons.icon('sparkle',18) }}</h1>
+  <p>Here's what's happening with your career journey today.</p>
+</div>
+
+<div class="stat-cards">
+  <div class="stat-card tone-indigo animate-in">
+    <div class="stat-card-top">
+      <div class="stat-card-icon">{{ icons.icon('clipboard',20) }}</div>
+    </div>
+    <div class="stat-card-value">{{ applications|length }}</div>
+    <div class="stat-card-label">Total Applications</div>
+  </div>
+  <div class="stat-card tone-warning animate-in">
+    <div class="stat-card-top">
+      <div class="stat-card-icon">{{ icons.icon('clock',20) }}</div>
+    </div>
+    <div class="stat-card-value">{{ pending_count }}</div>
+    <div class="stat-card-label">Pending Review</div>
+  </div>
+  <div class="stat-card tone-success animate-in">
+    <div class="stat-card-top">
+      <div class="stat-card-icon">{{ icons.icon('check-circle',20) }}</div>
+    </div>
+    <div class="stat-card-value">{{ accepted_count }}</div>
+    <div class="stat-card-label">Accepted</div>
+  </div>
+  <div class="stat-card tone-danger animate-in">
+    <div class="stat-card-top">
+      <div class="stat-card-icon">{{ icons.icon('x-circle',20) }}</div>
+    </div>
+    <div class="stat-card-value">{{ rejected_count }}</div>
+    <div class="stat-card-label">Rejected</div>
+  </div>
+</div>
+
+<div class="cards-grid" style="grid-template-columns: 2fr 1fr; align-items:start; margin-bottom: 32px;">
+  <div class="card" data-reveal>
+    <div class="flex-between mb-2">
+      <h3 style="font-size:1.05rem;">{{ icons.icon('star',18) }} Recommended For You</h3>
+      <a href="{{ url_for('opportunities', filter='recommended') }}" class="btn btn-ghost btn-sm">View All {{ icons.icon('chevron-right',14) }}</a>
+    </div>
+    {% if recommended %}
+      <div class="cards-grid cards-grid-2">
+        {% for opp, pct in recommended %}
+          <a href="{{ url_for('opportunity_detail', opportunity_id=opp.opportunity_id) }}" class="opp-card card card-hover">
+            <div class="opp-card-top">
+              <span class="badge badge-type">{{ opp.opportunity_type }}</span>
+              <span class="match-badge {% if pct >= 80 %}match-high{% elif pct >= 60 %}match-med{% else %}match-low{% endif %}">{{ pct }}% match</span>
+            </div>
+            <h3 class="opp-title">{{ opp.title }}</h3>
+            <p class="opp-org">{{ icons.icon('building',14) }} {{ opp.organization.organization_name }}</p>
+            <p class="opp-meta">{{ icons.icon('location',14) }} {{ opp.location or 'N/A' }}</p>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state" style="padding: 40px 20px;">
+        <div class="empty-icon">{{ icons.icon('target',30) }}</div>
+        <h3>No matches yet</h3>
+        <p>Add skills to your profile to get personalized recommendations.</p>
+        <a href="{{ url_for('manage_profile') }}" class="btn btn-primary btn-sm">Update Skills</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="card" data-reveal data-reveal-delay="2">
+    <div class="completion-header">
+      <h3 style="font-size:1rem;">Profile Completion</h3>
+      <span class="completion-pct">{{ completion }}%</span>
+    </div>
+    <div class="progress-bar-wrap mb-3">
+      <div class="progress-bar-fill" style="width:{{ completion }}%; background: {% if completion < 40 %}var(--danger){% elif completion < 75 %}var(--warning){% else %}var(--success){% endif %};"></div>
+    </div>
+    <p style="font-size:.85rem; margin-bottom: 18px;">
+      {% if completion < 100 %}A complete profile gets you better matches and more visibility to organizations.{% else %}Your profile is complete — great work!{% endif %}
+    </p>
+    <a href="{{ url_for('manage_profile') }}" class="btn btn-outline btn-sm btn-block">{{ icons.icon('edit',15) }} Complete Profile</a>
+
+    <hr class="divider">
+    <h3 style="font-size:.9rem; margin-bottom:12px;">Quick Actions</h3>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <a href="{{ url_for('opportunities') }}" class="btn btn-ghost btn-sm" style="justify-content:flex-start;">{{ icons.icon('search',16) }} Browse Vacancies</a>
+      <a href="{{ url_for('my_applications') }}" class="btn btn-ghost btn-sm" style="justify-content:flex-start;">{{ icons.icon('clipboard',16) }} My Applications</a>
+      <a href="{{ url_for('student_profile') }}" class="btn btn-ghost btn-sm" style="justify-content:flex-start;">{{ icons.icon('user',16) }} View Profile</a>
+    </div>
+  </div>
+</div>
+
+<div class="card" data-reveal>
+  <div class="flex-between mb-2">
+    <h3 style="font-size:1.05rem;">{{ icons.icon('clipboard',18) }} Recent Applications</h3>
+    <a href="{{ url_for('my_applications') }}" class="btn btn-ghost btn-sm">View All {{ icons.icon('chevron-right',14) }}</a>
+  </div>
+  {% if applications %}
+    <div class="table-card" style="box-shadow:none; border-radius: var(--radius);">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Vacancy</th><th>Organization</th><th>Applied</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for a in applications[:5] %}
+              <tr>
+                <td data-label="Vacancy"><a href="{{ url_for('opportunity_detail', opportunity_id=a.opportunity_id) }}" class="cell-strong">{{ a.opportunity.title }}</a></td>
+                <td data-label="Organization">{{ a.opportunity.organization.organization_name }}</td>
+                <td data-label="Applied"><span class="cell-muted">{{ a.applied_at.strftime('%d %b %Y') }}</span></td>
+                <td data-label="Status"><span class="badge badge-status badge-{{ a.status.lower() }}">{{ a.status }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty-state" style="padding: 40px 20px;">
+      <div class="empty-icon">{{ icons.icon('clipboard',30) }}</div>
+      <h3>No applications yet</h3>
+      <p>Browse available opportunities and submit your first application.</p>
+      <a href="{{ url_for('opportunities') }}" class="btn btn-primary btn-sm">Browse Vacancies</a>
+    </div>
+  {% endif %}
+</div>
+
+{% if latest %}
+<div class="card mt-3" data-reveal>
+  <div class="flex-between mb-2">
+    <h3 style="font-size:1.05rem;">{{ icons.icon('briefcase',18) }} Latest Opportunities</h3>
+    <a href="{{ url_for('opportunities') }}" class="btn btn-ghost btn-sm">View All {{ icons.icon('chevron-right',14) }}</a>
+  </div>
+  <div class="cards-grid cards-grid-3">
+    {% for opp in latest %}
+      <a href="{{ url_for('opportunity_detail', opportunity_id=opp.opportunity_id) }}" class="opp-card card card-hover">
+        <div class="opp-card-top">
+          <span class="badge badge-type">{{ opp.opportunity_type }}</span>
+          {% set pct = latest_match.get(opp.opportunity_id, 0) %}
+          <span class="match-badge {% if pct >= 80 %}match-high{% elif pct >= 60 %}match-med{% else %}match-low{% endif %}">{{ pct }}% match</span>
+        </div>
+        <h3 class="opp-title">{{ opp.title }}</h3>
+        <p class="opp-org">{{ icons.icon('building',14) }} {{ opp.organization.organization_name }}</p>
+        <p class="opp-meta">{{ icons.icon('location',14) }} {{ opp.location or 'N/A' }}</p>
+        {% if opp.opportunity_id in applied_ids %}<span class="badge badge-success mt-1">{{ icons.icon('check',12) }} Applied</span>{% endif %}
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

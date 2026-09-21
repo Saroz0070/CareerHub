@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Access Denied — CareerHub{% endblock %}
+{% block content %}
+<div class="error-page">
+  <div class="bg-decor"><div class="blob blob-1"></div><div class="blob blob-3"></div></div>
+  <div style="position:relative; z-index:1;">
+    <div class="error-code">403</div>
+    <h1>Access denied</h1>
+    <p>You don't have permission to view this page. If you think this is a mistake, try logging in with the right account.</p>
+    <div class="action-row" style="justify-content:center;">
+      <a href="{{ url_for('home') }}" class="btn btn-primary btn-lg">{{ icons.icon('home',18) }} Back to Home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

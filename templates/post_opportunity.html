@@ -1,0 +1,81 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% set is_edit = edit is defined and edit %}
+{% block title %}{{ 'Edit Vacancy' if is_edit else 'Post a Vacancy' }} — CareerHub{% endblock %}
+{% block app_content %}
+
+<div class="app-topbar">
+  <div class="app-topbar-title">
+    <span class="page-eyebrow">{{ icons.icon('briefcase',14) }} Vacancy</span>
+    <h1>{{ 'Edit Vacancy' if is_edit else 'Post a New Vacancy' }}</h1>
+    <p>{{ 'Update the details of this vacancy.' if is_edit else 'Fill in the details below to publish a new opportunity.' }}</p>
+  </div>
+  <a href="{{ url_for('manage_opportunities') }}" class="btn btn-outline btn-sm">{{ icons.icon('chevron-left',15) }} Back to Vacancies</a>
+</div>
+
+<form method="POST"
+      action="{{ url_for('edit_opportunity', opp_id=opp.opportunity_id) if is_edit else url_for('post_opportunity') }}"
+      class="card" style="max-width: 760px;" data-reveal novalidate>
+
+  <div class="form-group">
+    <label class="form-label" for="title">Job Title</label>
+    <input class="form-control" type="text" id="title" name="title" placeholder="e.g. Frontend Developer Intern"
+           value="{{ opp.title if is_edit else (title or '') }}" required>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label" for="opportunity_type">Opportunity Type</label>
+      <select class="form-control" id="opportunity_type" name="opportunity_type" required>
+        {% set current_type = opp.opportunity_type if is_edit else opportunity_type %}
+        <option value="" {{ 'selected' if not current_type }} disabled>Select type…</option>
+        {% for t in ['Internship', 'Full-time', 'Part-time', 'Contract', 'Remote'] %}
+          <option value="{{ t }}" {{ 'selected' if current_type == t }}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="location">Location</label>
+      <input class="form-control" type="text" id="location" name="location" placeholder="City or 'Remote'"
+             value="{{ opp.location if is_edit else (location or '') }}" required>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="description">Description</label>
+    <textarea class="form-control" id="description" name="description" rows="6" placeholder="Describe responsibilities, expectations and what makes this role great…" required>{{ opp.description if is_edit else (description or '') }}</textarea>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="required_skills">Required Skills <span class="optional">(comma-separated)</span></label>
+    <input class="form-control" type="text" id="required_skills" name="required_skills" placeholder="Python, SQL, Communication"
+           value="{{ opp.required_skills if is_edit else (required_skills or '') }}" data-chip-preview="skills-preview">
+    <div class="chip-preview" id="skills-preview"></div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label" for="experience_required">Experience Required (years)</label>
+      <input class="form-control" type="number" id="experience_required" name="experience_required" min="0" max="40"
+             value="{{ opp.experience_required if is_edit else (experience_required or 0) }}">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="salary">Salary <span class="optional">(optional)</span></label>
+      <input class="form-control" type="text" id="salary" name="salary" placeholder="e.g. $60,000 - $75,000 / year"
+             value="{{ (opp.salary or '') if is_edit else (salary or '') }}">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="deadline">Application Deadline</label>
+    <input class="form-control" type="date" id="deadline" name="deadline"
+           value="{{ opp.deadline.strftime('%Y-%m-%d') if (is_edit and opp.deadline) else (deadline or '') }}" required>
+  </div>
+
+  <div class="action-row" style="margin-top:8px;">
+    <button type="submit" class="btn btn-primary btn-lg">{{ icons.icon('check',17) }} {{ 'Save Changes' if is_edit else 'Publish Vacancy' }}</button>
+    <a href="{{ url_for('manage_opportunities') }}" class="btn btn-outline btn-lg">Cancel</a>
+  </div>
+</form>
+
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Manage Vacancies — CareerHub{% endblock %}
+{% block app_content %}
+
+<div class="app-topbar">
+  <div class="app-topbar-title">
+    <span class="page-eyebrow">{{ icons.icon('briefcase',14) }} Vacancies</span>
+    <h1>Manage Vacancies</h1>
+    <p>{{ vacancies|length }} vacanc{{ 'y' if vacancies|length == 1 else 'ies' }} posted</p>
+  </div>
+  {% if org.verification_status == 'Verified' %}
+    <a href="{{ url_for('post_opportunity') }}" class="btn btn-primary btn-sm">{{ icons.icon('plus',16) }} Post a Vacancy</a>
+  {% else %}
+    <span class="btn btn-disabled btn-sm">{{ icons.icon('plus',16) }} Post a Vacancy (Verify First)</span>
+  {% endif %}
+</div>
+
+{% if vacancies %}
+  <div class="table-card" data-reveal>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead><tr><th>Vacancy</th><th>Type</th><th>Applicants</th><th>Deadline</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for v in vacancies %}
+            {% set expired = v.deadline and v.deadline < today %}
+            <tr>
+              <td data-label="Vacancy" class="cell-strong">{{ v.title }}</td>
+              <td data-label="Type"><span class="badge badge-type">{{ v.opportunity_type }}</span></td>
+              <td data-label="Applicants"><a href="{{ url_for('org_applicants', opp_id=v.opportunity_id) }}">{{ v.applications|length }} applicant(s)</a></td>
+              <td data-label="Deadline"><span class="cell-muted">{{ v.deadline.strftime('%d %b %Y') if v.deadline else 'No deadline' }}</span></td>
+              <td data-label="Status">
+                {% if expired %}<span class="badge badge-danger">Expired</span>{% else %}<span class="badge badge-success">Active</span>{% endif %}
+              </td>
+              <td data-label="Actions">
+                <div class="table-actions">
+                  <a href="{{ url_for('edit_opportunity', opp_id=v.opportunity_id) }}" class="btn btn-ghost btn-sm btn-icon" aria-label="Edit">{{ icons.icon('edit',15) }}</a>
+                  <form method="POST" action="{{ url_for('delete_opportunity', opp_id=v.opportunity_id) }}" data-confirm="Delete '{{ v.title }}'? This cannot be undone.">
+                    <button type="submit" class="btn btn-ghost btn-sm btn-icon" style="color:var(--danger);" aria-label="Delete">{{ icons.icon('trash',15) }}</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">{{ icons.icon('briefcase',32) }}</div>
+    <h3>No vacancies posted yet</h3>
+    <p>Once you post a vacancy, it will appear here for you to manage.</p>
+    {% if org.verification_status == 'Verified' %}
+      <a href="{{ url_for('post_opportunity') }}" class="btn btn-primary btn-sm">Post Your First Vacancy</a>
+    {% else %}
+      <p style="font-size:.8rem; color:var(--warning);">Your organization must be verified by an admin before you can post vacancies.</p>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% endblock %}

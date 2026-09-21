@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Register Your Organization — CareerHub{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-visual" style="background: radial-gradient(ellipse 100% 80% at 20% 0%, #0d2b3a, var(--navy-950));">
+    <div class="bg-decor"><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
+    <div class="auth-visual-content">
+      <span class="brand-mark">{{ icons.icon('building', 22) }}</span>
+      <h2>Reach candidates who actually fit.</h2>
+      <p>Post vacancies, get verified, and review a shortlist of applicants ranked by real skill match.</p>
+      <div class="auth-feature-list">
+        <div class="auth-feature-item"><span class="ico">{{ icons.icon('shield',18) }}</span><span>Verified badge builds applicant trust</span></div>
+        <div class="auth-feature-item"><span class="ico">{{ icons.icon('users',18) }}</span><span>Manage every applicant from one place</span></div>
+        <div class="auth-feature-item"><span class="ico">{{ icons.icon('trending',18) }}</span><span>Post, edit and close vacancies anytime</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-form-box" style="max-width: 480px;">
+      <div class="auth-head">
+        <h1>Register your organization</h1>
+        <p>Your account is reviewed by an admin before you can post vacancies.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('org_register') }}" enctype="multipart/form-data" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="organization_name">Organization Name</label>
+          <div class="input-wrap">
+            <span class="input-icon">{{ icons.icon('building',17) }}</span>
+            <input class="form-control has-icon" type="text" id="organization_name" name="organization_name" placeholder="Acme Technologies" value="{{ organization_name or '' }}" required autofocus>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">{{ icons.icon('mail',17) }}</span>
+            <input class="form-control has-icon" type="email" id="email" name="email" placeholder="hr@company.com" value="{{ email or '' }}" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="password-field">
+              <input class="form-control" type="password" id="password" name="password" placeholder="At least 6 characters" required minlength="6">
+              <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Show password">{{ icons.icon('eye',17) }}{{ icons.icon('eye-off',17) }}</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="confirm_password">Confirm Password</label>
+            <div class="password-field">
+              <input class="form-control" type="password" id="confirm_password" name="confirm_password" placeholder="Repeat password" required minlength="6">
+              <button type="button" class="password-toggle" data-password-toggle="confirm_password" aria-label="Show password">{{ icons.icon('eye',17) }}{{ icons.icon('eye-off',17) }}</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone <span class="required"></span></label>
+            <input class="form-control" type="text" id="phone" name="phone" placeholder="+977 9812345678" value="{{ phone or '' }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="address">Address <span class="required"></span></label>
+            <input class="form-control" type="text" id="address" name="address" placeholder="City, Country" value="{{ address or '' }}" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="description">Organization Description <span class="required"></span></label>
+          <textarea class="form-control" id="description" name="description" rows="3" placeholder="What does your organization do?">{{ description or '' }} </textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Verification Document <span class="optional">(PDF/DOC — optional but speeds up verification)</span></label>
+          <label class="file-drop">
+            <span class="file-drop-icon">{{ icons.icon('upload',20) }}</span>
+            <span class="file-drop-text"><span class="file-drop-filename">Click to upload a business registration document</span></span>
+            <input class="file-input" type="file" name="verification_document" accept=".pdf,.doc,.docx">
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">{{ icons.icon('arrow-right',18) }} Register Organization</button>
+      </form>
+
+      <div class="auth-switch">Already registered? <a href="{{ url_for('org_login') }}">Log in</a></div>
+      <div class="auth-divider">or</div>
+      <a href="{{ url_for('student_register') }}" class="auth-alt-role">{{ icons.icon('user',17) }} Register as a Student instead</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

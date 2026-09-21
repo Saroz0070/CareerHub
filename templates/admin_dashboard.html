@@ -1,0 +1,91 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Admin Dashboard — CareerHub{% endblock %}
+{% block app_content %}
+
+<div class="app-welcome-banner animate-in" style="background: linear-gradient(120deg, var(--navy-950), var(--admin) 160%);">
+  <div class="welcome-icon">{{ icons.icon('shield', 80) }}</div>
+  <h1>Admin Overview {{ icons.icon('sparkle',18) }}</h1>
+  <p>Platform-wide statistics and organization verification queue.</p>
+</div>
+
+<div class="stat-cards">
+  <div class="stat-card tone-indigo animate-in"><div class="stat-card-top"><div class="stat-card-icon">{{ icons.icon('user',20) }}</div></div><div class="stat-card-value">{{ students_count }}</div><div class="stat-card-label">Students</div></div>
+  <div class="stat-card tone-teal animate-in"><div class="stat-card-top"><div class="stat-card-icon">{{ icons.icon('building',20) }}</div></div><div class="stat-card-value">{{ verified|length + pending|length + rejected|length }}</div><div class="stat-card-label">Organizations</div></div>
+  <div class="stat-card tone-warning animate-in"><div class="stat-card-top"><div class="stat-card-icon">{{ icons.icon('briefcase',20) }}</div></div><div class="stat-card-value">{{ opps_count }}</div><div class="stat-card-label">Vacancies Posted</div></div>
+  <div class="stat-card tone-success animate-in"><div class="stat-card-top"><div class="stat-card-icon">{{ icons.icon('clipboard',20) }}</div></div><div class="stat-card-value">{{ apps_count }}</div><div class="stat-card-label">Applications</div></div>
+</div>
+
+<div class="card mb-3" data-reveal>
+  <div class="flex-between mb-2">
+    <h3 style="font-size:1.05rem;">{{ icons.icon('clock',18) }} Pending Verification <span class="badge badge-warning">{{ pending|length }}</span></h3>
+    <a href="{{ url_for('admin_organizations') }}" class="btn btn-ghost btn-sm">View All {{ icons.icon('chevron-right',14) }}</a>
+  </div>
+  {% if pending %}
+    <div class="table-card" style="box-shadow:none; border-radius: var(--radius);">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Organization</th><th>Email</th><th>Registered</th><th>Actions</th></tr></thead>
+          <tbody>
+            {% for org in pending %}
+              <tr>
+                <td data-label="Organization" class="cell-strong">{{ org.organization_name }}</td>
+                <td data-label="Email">{{ org.email }}</td>
+                <td data-label="Registered"><span class="cell-muted">{{ org.created_at.strftime('%d %b %Y') }}</span></td>
+                <td data-label="Actions">
+                  <div class="table-actions">
+                    <form method="POST" action="{{ url_for('admin_verify_org', org_id=org.organization_id) }}">
+                      <button type="submit" class="btn btn-success btn-sm">{{ icons.icon('check',14) }} Verify</button>
+                    </form>
+                    <a href="{{ url_for('admin_org_detail', org_id=org.organization_id) }}" class="btn btn-ghost btn-sm">Review</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty-state" style="padding: 34px 20px;">
+      <div class="empty-icon">{{ icons.icon('check-circle',28) }}</div>
+      <h3>All caught up</h3>
+      <p>There are no organizations waiting for verification.</p>
+    </div>
+  {% endif %}
+</div>
+
+<div class="cards-grid cards-grid-2">
+  <div class="card" data-reveal>
+    <h3 style="font-size:.95rem; margin-bottom:12px;">{{ icons.icon('check-circle',16) }} Recently Verified</h3>
+    {% if verified %}
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        {% for org in verified[:5] %}
+          <div class="flex-between">
+            <span style="font-size:.87rem; font-weight:600;">{{ org.organization_name }}</span>
+            <span class="verif-badge Verified">Verified</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="font-size:.85rem;">No verified organizations yet.</p>
+    {% endif %}
+  </div>
+  <div class="card" data-reveal data-reveal-delay="2">
+    <h3 style="font-size:.95rem; margin-bottom:12px;">{{ icons.icon('x-circle',16) }} Rejected</h3>
+    {% if rejected %}
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        {% for org in rejected[:5] %}
+          <div class="flex-between">
+            <span style="font-size:.87rem; font-weight:600;">{{ org.organization_name }}</span>
+            <span class="verif-badge Rejected">Rejected</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="font-size:.85rem;">No rejected organizations.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

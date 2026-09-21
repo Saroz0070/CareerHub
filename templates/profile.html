@@ -1,0 +1,99 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}My Profile — CareerHub{% endblock %}
+{% block app_content %}
+
+<div class="profile-header-banner animate-in">
+  <div class="profile-avatar">{{ student.full_name[0].upper() }}</div>
+  <div>
+    <h1>{{ student.full_name }}</h1>
+    <p>{{ student.email }} &middot; Member since {{ student.created_at.strftime('%B %Y') }}</p>
+  </div>
+  <div style="margin-left:auto; display:flex; gap:10px;">
+    <a href="{{ url_for('manage_profile') }}" class="btn btn-light">{{ icons.icon('edit',16) }} Edit Profile</a>
+  </div>
+</div>
+
+<div class="completion-card card" data-reveal>
+  <div class="completion-header">
+    <h3>Profile Completion</h3>
+    <span class="completion-pct">{{ completion }}%</span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" style="width: {{ completion }}%;
+      background: {% if completion < 40 %}var(--danger){% elif completion < 75 %}var(--warning){% else %}var(--success){% endif %};"></div>
+  </div>
+</div>
+
+<div class="cards-grid" style="grid-template-columns: 2fr 1fr; align-items:start;">
+  <div class="profile-card card" data-reveal>
+    <div class="profile-info" style="width:100%;">
+      <div class="profile-row">
+        <div class="profile-field">
+          <span class="field-label">{{ icons.icon('phone',13) }} Phone</span>
+          <span class="field-value">{{ student.phone or '—' }}</span>
+        </div>
+        <div class="profile-field">
+          <span class="field-label">{{ icons.icon('trending',13) }} Experience</span>
+          <span class="field-value">{{ student.experience or 0 }} year(s)</span>
+        </div>
+      </div>
+      <div class="profile-field profile-field-full">
+        <span class="field-label">{{ icons.icon('location',13) }} Address</span>
+        <span class="field-value">{{ student.address or '—' }}</span>
+      </div>
+      <div class="profile-field profile-field-full">
+        <span class="field-label">Education</span>
+        <span class="field-value">{{ student.education or '—' }}</span>
+      </div>
+      <div class="profile-field profile-field-full">
+        <span class="field-label">Skills</span>
+        <div class="skill-tags">
+          {% if student.skills %}
+            {% for skill in student.skills.split(',') %}{% if skill.strip() %}<span class="skill-tag">{{ skill.strip() }}</span>{% endif %}{% endfor %}
+          {% else %}
+            <span class="field-value" style="color:var(--text-faint);">No skills added yet.</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="profile-field profile-field-full">
+        <span class="field-label">Interests</span>
+        <div class="skill-tags">
+          {% if student.interests %}
+            {% for i in student.interests.split(',') %}{% if i.strip() %}<span class="skill-tag" style="background:#e0f9f5; color:var(--teal-500);">{{ i.strip() }}</span>{% endif %}{% endfor %}
+          {% else %}
+            <span class="field-value" style="color:var(--text-faint);">No interests added yet.</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-reveal data-reveal-delay="2">
+    <h3 style="font-size:1rem; margin-bottom:16px;">{{ icons.icon('file',18) }} Resume</h3>
+    {% if student.resume %}
+      <div class="flex gap-2" style="align-items:center; padding:14px; background:var(--success-bg); border-radius: var(--radius); margin-bottom:14px;">
+        <div class="stat-card-icon" style="background:rgba(18,164,84,.15); color:var(--success);">{{ icons.icon('file',18) }}</div>
+        <div style="min-width:0;">
+          <div style="font-weight:700; font-size:.85rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Resume uploaded</div>
+          <div style="font-size:.76rem; color:var(--text-faint);">PDF / DOC</div>
+        </div>
+      </div>
+      <a href="{{ url_for('student_resume') }}" class="btn btn-outline btn-sm btn-block">{{ icons.icon('download',15) }} Download Resume</a>
+    {% else %}
+      <div class="empty-state" style="padding:24px 16px;">
+        <div class="empty-icon" style="width:56px; height:56px;">{{ icons.icon('file',22) }}</div>
+        <p style="font-size:.85rem;">No resume uploaded yet.</p>
+        <a href="{{ url_for('manage_profile') }}" class="btn btn-primary btn-sm">Upload Now</a>
+      </div>
+    {% endif %}
+    <hr class="divider">
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <a href="{{ url_for('manage_profile') }}" class="btn btn-ghost btn-sm" style="justify-content:flex-start;">{{ icons.icon('edit',16) }} Edit Profile</a>
+      <a href="{{ url_for('opportunities') }}" class="btn btn-ghost btn-sm" style="justify-content:flex-start;">{{ icons.icon('briefcase',16) }} Browse Vacancies</a>
+      <a href="{{ url_for('my_applications') }}" class="btn btn-ghost btn-sm" style="justify-content:flex-start;">{{ icons.icon('clipboard',16) }} My Applications</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Browse Vacancies — CareerHub{% endblock %}
+{% block app_content %}
+
+<div class="app-topbar">
+  <div class="app-topbar-title">
+    <span class="page-eyebrow">{{ icons.icon('briefcase',14) }} Opportunities</span>
+    <h1>Browse Vacancies</h1>
+    <p>{{ opp_list|length }} opportunit{{ 'y' if opp_list|length == 1 else 'ies' }} found</p>
+  </div>
+</div>
+
+<form method="GET" action="{{ url_for('opportunities') }}" class="filter-bar" data-no-loading>
+  <input type="hidden" name="filter" value="{{ filter_type }}">
+  <div class="filter-bar-row">
+    <div class="form-group" style="margin-bottom:0;">
+      <label class="form-label" for="q">Search</label>
+      <div class="input-wrap">
+        <span class="input-icon">{{ icons.icon('search',16) }}</span>
+        <input class="form-control has-icon" type="text" id="q" name="q" value="{{ query_text }}" placeholder="Job title, skill, keyword…">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:0;">
+      <label class="form-label" for="location">Location</label>
+      <input class="form-control" type="text" id="location" name="location" value="{{ location_f }}" placeholder="City, remote…">
+    </div>
+    <div class="form-group" style="margin-bottom:0;">
+      <label class="form-label" for="type">Type</label>
+      <select class="form-control" id="type" name="type">
+        <option value="">All Types</option>
+        {% for t in all_types %}
+          <option value="{{ t }}" {{ 'selected' if type_f == t }}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">{{ icons.icon('search',16) }} Search</button>
+  </div>
+  <div class="filter-tabs">
+    <a href="{{ url_for('opportunities', filter='all', q=query_text, location=location_f, type=type_f) }}"
+       class="filter-tab {{ 'active' if filter_type == 'all' }}">All Vacancies</a>
+    <a href="{{ url_for('opportunities', filter='recommended', q=query_text, location=location_f, type=type_f) }}"
+       class="filter-tab {{ 'active' if filter_type == 'recommended' }}">{{ icons.icon('star',13) }} Recommended</a>
+    {% if query_text or location_f or type_f %}
+      <a href="{{ url_for('opportunities', filter=filter_type) }}" class="filter-tab">{{ icons.icon('x',13) }} Clear Filters</a>
+    {% endif %}
+  </div>
+</form>
+
+{% if opp_list %}
+  <div class="cards-grid cards-grid-3">
+    {% for opp, pct in opp_list %}
+      {% set expired = is_expired(opp) %}
+      <div class="opp-card card card-hover {{ 'opp-card-expired' if expired }}" data-reveal>
+        <div class="opp-card-top">
+          <span class="badge badge-type">{{ opp.opportunity_type }}</span>
+          <span class="match-badge {% if pct >= 80 %}match-high{% elif pct >= 60 %}match-med{% else %}match-low{% endif %}">{{ pct }}% match</span>
+        </div>
+        <h3 class="opp-title">{{ opp.title }}</h3>
+        <p class="opp-org">{{ icons.icon('building',14) }} {{ opp.organization.organization_name }}</p>
+        <p class="opp-meta">{{ icons.icon('location',14) }} {{ opp.location or 'Location N/A' }}</p>
+        {% if opp.salary %}<p class="opp-meta">{{ icons.icon('money',14) }} {{ opp.salary }}</p>{% endif %}
+        {% if opp.required_skills %}
+          <p class="opp-meta">{{ icons.icon('tool',14) }} {{ opp.required_skills[:55] }}{% if opp.required_skills|length > 55 %}…{% endif %}</p>
+        {% endif %}
+        {% if opp.deadline %}
+          <p class="opp-meta {{ 'deadline-passed' if expired }}">{{ icons.icon('calendar',14) }} {{ 'Expired' if expired else 'Apply by' }} {{ opp.deadline.strftime('%d %b %Y') }}</p>
+        {% endif %}
+        <div class="opp-card-footer">
+          <a href="{{ url_for('opportunity_detail', opportunity_id=opp.opportunity_id) }}" class="btn btn-outline btn-sm">View Details</a>
+          {% if opp.opportunity_id in applied_ids %}
+            <span class="btn btn-disabled btn-sm">{{ icons.icon('check',14) }} Applied</span>
+          {% elif expired %}
+            <span class="btn btn-disabled btn-sm">Expired</span>
+          {% else %}
+            <form method="POST" action="{{ url_for('apply_opportunity', opportunity_id=opp.opportunity_id) }}" style="flex:1;">
+              <button type="submit" class="btn btn-primary btn-sm btn-block">Quick Apply</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">{{ icons.icon('search',32) }}</div>
+    <h3>No vacancies found</h3>
+    {% if filter_type == 'recommended' %}
+      <p>No recommended vacancies match your profile yet. <a href="{{ url_for('manage_profile') }}">Update your skills</a> to improve matches.</p>
+    {% elif query_text or location_f or type_f %}
+      <p>Try adjusting your search or filters to see more results.</p>
+      <a href="{{ url_for('opportunities') }}" class="btn btn-primary btn-sm">Clear Filters</a>
+    {% else %}
+      <p>No vacancies available right now. Please check back later.</p>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% endblock %}

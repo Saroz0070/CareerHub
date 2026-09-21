@@ -1,0 +1,94 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Organizations — CareerHub Admin{% endblock %}
+{% block app_content %}
+
+<div class="app-topbar">
+  <div class="app-topbar-title">
+    <span class="page-eyebrow">{{ icons.icon('building',14) }} Admin</span>
+    <h1>{{ 'Organization Review' if detail_org else 'All Organizations' }}</h1>
+    <p>{{ orgs|length }} organization{{ 's' if orgs|length != 1 }} {{ 'matching' if detail_org else 'registered' }}</p>
+  </div>
+  {% if detail_org %}
+    <a href="{{ url_for('admin_organizations') }}" class="btn btn-outline btn-sm">{{ icons.icon('chevron-left',15) }} All Organizations</a>
+  {% endif %}
+</div>
+
+{% if detail_org %}
+  <div class="org-detail-panel" data-reveal>
+    <div class="flex-between mb-2" style="flex-wrap:wrap; gap:12px;">
+      <div>
+        <h2 style="font-size:1.3rem;">{{ detail_org.organization_name }}</h2>
+        <p style="font-size:.87rem;">{{ detail_org.email }} &middot; Registered {{ detail_org.created_at.strftime('%d %B %Y') }}</p>
+      </div>
+      <span class="verif-badge {{ detail_org.verification_status }}" style="font-size:.8rem; padding:8px 16px;">{{ detail_org.verification_status }}</span>
+    </div>
+    <div class="profile-row mt-2">
+      <div class="profile-field"><span class="field-label">Phone</span><span class="field-value">{{ detail_org.phone or '—' }}</span></div>
+      <div class="profile-field"><span class="field-label">Address</span><span class="field-value">{{ detail_org.address or '—' }}</span></div>
+    </div>
+    <div class="profile-field profile-field-full mt-2">
+      <span class="field-label">Description</span>
+      <span class="field-value">{{ detail_org.description or '—' }}</span>
+    </div>
+    {% if detail_org.verification_document %}
+      <div class="profile-field profile-field-full mt-2">
+        <span class="field-label">Verification Document</span>
+        <a href="{{ url_for('admin_verification_doc', org_id=detail_org.organization_id) }}" class="btn btn-outline btn-sm mt-1" style="width:fit-content;">{{ icons.icon('file',15) }} {{ detail_org.verification_document }}</a>
+      </div>
+    {% endif %}
+    {% if detail_org.verification_note %}
+      <div class="profile-field profile-field-full mt-2">
+        <span class="field-label">Admin Note</span>
+        <span class="field-value">{{ detail_org.verification_note }}</span>
+      </div>
+    {% endif %}
+
+    <hr class="divider">
+    <div class="cards-grid cards-grid-2">
+      <form method="POST" action="{{ url_for('admin_verify_org', org_id=detail_org.organization_id) }}" class="note-form">
+        <label class="form-label" for="note-verify">Verify with optional note</label>
+        <textarea class="form-control" id="note-verify" name="note" placeholder="Optional note for this decision…"></textarea>
+        <button type="submit" class="btn btn-success mt-2">{{ icons.icon('check',16) }} Verify Organization</button>
+      </form>
+      <form method="POST" action="{{ url_for('admin_reject_org', org_id=detail_org.organization_id) }}" class="note-form">
+        <label class="form-label" for="note-reject">Reject with reason</label>
+        <textarea class="form-control" id="note-reject" name="note" placeholder="Explain why this registration is being rejected…"></textarea>
+        <button type="submit" class="btn btn-danger mt-2">{{ icons.icon('x',16) }} Reject Organization</button>
+      </form>
+    </div>
+  </div>
+{% else %}
+  {% if orgs %}
+    <div class="table-card" data-reveal>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Organization</th><th>Email</th><th>Registered</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            {% for org in orgs %}
+              <tr>
+                <td data-label="Organization" class="cell-strong">{{ org.organization_name }}</td>
+                <td data-label="Email">{{ org.email }}</td>
+                <td data-label="Registered"><span class="cell-muted">{{ org.created_at.strftime('%d %b %Y') }}</span></td>
+                <td data-label="Status"><span class="verif-badge {{ org.verification_status }}">{{ org.verification_status }}</span></td>
+                <td data-label="Actions">
+                  <div class="table-actions">
+                    <a href="{{ url_for('admin_org_detail', org_id=org.organization_id) }}" class="btn btn-ghost btn-sm">Review {{ icons.icon('chevron-right',13) }}</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">{{ icons.icon('building',32) }}</div>
+      <h3>No organizations yet</h3>
+      <p>Organizations will appear here once they register.</p>
+    </div>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

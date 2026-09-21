@@ -1,0 +1,89 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Edit Profile — CareerHub{% endblock %}
+{% block app_content %}
+
+<div class="app-topbar">
+  <div class="app-topbar-title">
+    <span class="page-eyebrow">{{ icons.icon('edit',14) }} Profile Settings</span>
+    <h1>Edit Your Profile</h1>
+    <p>Keep your details up to date for better vacancy matches.</p>
+  </div>
+  <a href="{{ url_for('student_profile') }}" class="btn btn-outline btn-sm">{{ icons.icon('chevron-left',15) }} Back to Profile</a>
+</div>
+
+<div class="cards-grid" style="grid-template-columns: 2fr 1fr; align-items:start;">
+  <form method="POST" action="{{ url_for('manage_profile') }}" enctype="multipart/form-data" class="card" data-reveal novalidate>
+    <input type="hidden" name="action" value="update">
+    <h3 style="font-size:1rem; margin-bottom:20px;">Basic Information</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="full_name">Full Name</label>
+        <input class="form-control" type="text" id="full_name" name="full_name" value="{{ student.full_name }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone</label>
+        <input class="form-control" type="text" id="phone" name="phone" value="{{ student.phone or '' }}" placeholder="+1 555 000 1234">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="address">Address</label>
+      <input class="form-control" type="text" id="address" name="address" value="{{ student.address or '' }}" placeholder="City, Country">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="education">Education</label>
+        <input class="form-control" type="text" id="education" name="education" value="{{ student.education or '' }}" placeholder="B.Sc. Computer Science">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="experience">Experience (years)</label>
+        <input class="form-control" type="number" id="experience" name="experience" min="0" max="60" value="{{ student.experience or 0 }}">
+      </div>
+    </div>
+
+    <hr class="divider">
+    <h3 style="font-size:1rem; margin-bottom:8px;">Skills &amp; Interests</h3>
+    <p class="form-hint" style="margin-bottom:16px;">Separate each item with a comma — these power your vacancy match score.</p>
+    <div class="form-group">
+      <label class="form-label" for="skills">Skills</label>
+      <input class="form-control" type="text" id="skills" name="skills" value="{{ student.skills or '' }}" placeholder="Python, SQL, Communication" data-chip-preview="skills-preview">
+      <div class="chip-preview" id="skills-preview"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="interests">Interests</label>
+      <input class="form-control" type="text" id="interests" name="interests" value="{{ student.interests or '' }}" placeholder="Data Science, Design" data-chip-preview="interests-preview">
+      <div class="chip-preview" id="interests-preview"></div>
+    </div>
+
+    <hr class="divider">
+    <h3 style="font-size:1rem; margin-bottom:12px;">Resume</h3>
+    <div class="form-group">
+      <label class="file-drop {{ 'has-file' if student.resume }}">
+        <span class="file-drop-icon">{{ icons.icon('upload',20) }}</span>
+        <span class="file-drop-text">
+          <span class="file-drop-filename">{{ 'Replace current resume' if student.resume else 'Click to upload your resume (PDF, DOC, DOCX)' }}</span>
+        </span>
+        <input class="file-input" type="file" name="resume" accept=".pdf,.doc,.docx">
+      </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg mt-2">{{ icons.icon('check',17) }} Save Changes</button>
+  </form>
+
+  <div>
+    <div class="card mb-3" data-reveal data-reveal-delay="2">
+      <h3 style="font-size:.95rem; margin-bottom:10px;">{{ icons.icon('info',16) }} Tips</h3>
+      <p style="font-size:.84rem; line-height:1.6;">A complete profile with skills and a resume dramatically improves your match score and visibility to organizations reviewing applicants.</p>
+    </div>
+    <div class="card" style="border-color:#f3c7cb;" data-reveal data-reveal-delay="3">
+      <h3 style="font-size:.95rem; margin-bottom:10px; color:var(--danger);">{{ icons.icon('alert',16) }} Danger Zone</h3>
+      <p style="font-size:.84rem; margin-bottom:14px;">Deleting your account removes your profile and application history permanently. This cannot be undone.</p>
+      <form method="POST" action="{{ url_for('manage_profile') }}" data-confirm="This will permanently delete your account and all your applications. Are you sure?">
+        <input type="hidden" name="action" value="delete">
+        <button type="submit" class="btn btn-danger-outline btn-sm btn-block">{{ icons.icon('trash',15) }} Delete My Account</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

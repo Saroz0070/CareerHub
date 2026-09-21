@@ -1,0 +1,91 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Applicants — CareerHub{% endblock %}
+{% block app_content %}
+
+<div class="app-topbar">
+  <div class="app-topbar-title">
+    <span class="page-eyebrow">{{ icons.icon('users',14) }} Applicants</span>
+    <h1>{{ 'Applicants for "' + selected_opp.title + '"' if selected_opp else 'All Applicants' }}</h1>
+    <p>{{ applicant_data|length }} applicant{{ 's' if applicant_data|length != 1 }} {{ 'for this vacancy' if selected_opp else 'across all vacancies' }}</p>
+  </div>
+</div>
+
+{% if vacancies %}
+<div class="vacancy-filter-pills">
+  <a href="{{ url_for('org_applicants') }}" class="{{ 'active' if not selected_opp }}">All Vacancies</a>
+  {% for v in vacancies %}
+    <a href="{{ url_for('org_applicants', opp_id=v.opportunity_id) }}" class="{{ 'active' if selected_opp and selected_opp.opportunity_id == v.opportunity_id }}">{{ v.title }} ({{ v.applications|length }})</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if applicant_data %}
+  <div class="cards-grid cards-grid-3">
+    {% for item in applicant_data %}
+      {% set a = item.application %}
+      {% set s = item.student %}
+      {% set o = item.opportunity %}
+      <div class="card applicant-card" data-reveal>
+        <div class="applicant-top">
+          <div class="table-avatar">{{ s.full_name[0]|upper }}</div>
+          <div style="min-width:0;">
+            <div class="applicant-name">{{ s.full_name }}</div>
+            <div class="applicant-email">{{ s.email }}</div>
+          </div>
+          <span class="match-badge {% if item.match_pct >= 80 %}match-high{% elif item.match_pct >= 60 %}match-med{% else %}match-low{% endif %}" style="margin-left:auto;">{{ item.match_pct }}%</span>
+        </div>
+
+        <ul class="applicant-meta-list">
+          <li>{{ icons.icon('briefcase',14) }} Applied for: <strong>{{ o.title }}</strong></li>
+          <li>{{ icons.icon('calendar',14) }} Applied {{ a.applied_at.strftime('%d %b %Y') }}</li>
+          <li>{{ icons.icon('trending',14) }} {{ s.experience or 0 }} yr(s) experience</li>
+          {% if s.education %}<li>{{ icons.icon('award',14) }} {{ s.education }}</li>{% endif %}
+        </ul>
+
+        {% if s.skills %}
+          <div class="skill-tags mt-1">
+            {% for skill in s.skills.split(',')[:5] %}{% if skill.strip() %}<span class="skill-tag">{{ skill.strip() }}</span>{% endif %}{% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="flex-between mt-2">
+          <span class="badge badge-status badge-{{ a.status.lower() }}">{{ a.status }}</span>
+          {% if s.resume %}
+            <a href="{{ url_for('org_resume', student_id=s.student_id) }}" class="btn btn-ghost btn-sm">{{ icons.icon('download',14) }} Resume</a>
+          {% else %}
+            <span class="cell-muted" style="font-size:.78rem;">No resume</span>
+          {% endif %}
+        </div>
+
+        <div class="applicant-actions">
+          <form method="POST" action="{{ url_for('update_application_status', application_id=a.application_id) }}" class="status-select-form" style="flex:1;">
+            <select name="status" class="form-control" onchange="this.form.requestSubmit()">
+              {% for st in ['Pending', 'Shortlisted', 'Accepted', 'Rejected'] %}
+                <option value="{{ st }}" {{ 'selected' if a.status == st }}>{{ st }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-ghost btn-sm btn-icon" aria-label="Update status">{{ icons.icon('check',14) }}</button>
+          </form>
+          <form method="POST" action="{{ url_for('update_application_status', application_id=a.application_id) }}">
+            <input type="hidden" name="status" value="Accepted">
+            <button type="submit" class="btn btn-success btn-sm btn-icon" aria-label="Accept">{{ icons.icon('check',15) }}</button>
+          </form>
+          <form method="POST" action="{{ url_for('update_application_status', application_id=a.application_id) }}">
+            <input type="hidden" name="status" value="Rejected">
+            <button type="submit" class="btn btn-danger btn-sm btn-icon" aria-label="Reject">{{ icons.icon('x',15) }}</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">{{ icons.icon('users',32) }}</div>
+    <h3>No applicants yet</h3>
+    <p>{{ 'No one has applied to this vacancy yet.' if selected_opp else 'Once candidates apply to your vacancies, they will appear here.' }}</p>
+    <a href="{{ url_for('manage_opportunities') }}" class="btn btn-primary btn-sm">Manage Vacancies</a>
+  </div>
+{% endif %}
+
+{% endblock %}

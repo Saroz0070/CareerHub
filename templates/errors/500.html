@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Something Went Wrong — CareerHub{% endblock %}
+{% block content %}
+<div class="error-page">
+  <div class="bg-decor"><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
+  <div style="position:relative; z-index:1;">
+    <div class="error-code">500</div>
+    <h1>Something went wrong on our end</h1>
+    <p>We hit an unexpected error while processing your request. Please try again in a moment.</p>
+    <div class="action-row" style="justify-content:center;">
+      <a href="{{ url_for('home') }}" class="btn btn-primary btn-lg">{{ icons.icon('home',18) }} Back to Home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

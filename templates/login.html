@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Student Login — CareerHub{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-visual">
+    <div class="bg-decor"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    <div class="auth-visual-content">
+      <span class="brand-mark">{{ icons.icon('trending', 22) }}</span>
+      <h2>Welcome back. Your opportunities are waiting.</h2>
+      <p>Log in to check your application status, discover newly matched vacancies, and keep your profile fresh.</p>
+      <div class="auth-feature-list">
+        <div class="auth-feature-item"><span class="ico">{{ icons.icon('dashboard',18) }}</span><span>A dashboard built around your progress</span></div>
+        <div class="auth-feature-item"><span class="ico">{{ icons.icon('bell',18) }}</span><span>Never lose track of a status update</span></div>
+        <div class="auth-feature-item"><span class="ico">{{ icons.icon('star',18) }}</span><span>Recommendations that improve with your profile</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-form-box">
+      <div class="auth-head">
+        <h1>Welcome back</h1>
+        <p>Log in to your CareerHub student account.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('student_login') }}" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">{{ icons.icon('mail',17) }}</span>
+            <input class="form-control has-icon" type="email" id="email" name="email" placeholder="you@example.com" required autofocus>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="password-field">
+            <input class="form-control" type="password" id="password" name="password" placeholder="Your password" required>
+            <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Show password">
+              {{ icons.icon('eye',17) }}{{ icons.icon('eye-off',17) }}
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">{{ icons.icon('arrow-right',18) }} Log In</button>
+      </form>
+
+      <div class="auth-switch">New to CareerHub? <a href="{{ url_for('student_register') }}">Create an account</a></div>
+      <div class="auth-divider">or</div>
+      <a href="{{ url_for('org_login') }}" class="auth-alt-role">{{ icons.icon('building',17) }} Log in as an Organization instead</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Create Your Student Account — CareerHub{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-visual">
+    <div class="bg-decor"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    <div class="auth-visual-content">
+      <span class="brand-mark">{{ icons.icon('trending', 22) }}</span>
+      <h2>Your next opportunity starts with a profile.</h2>
+      <p>Create your CareerHub account to unlock skill-matched vacancies, one-click applications and full status tracking.</p>
+      <div class="auth-feature-list">
+        <div class="auth-feature-item"><span class="ico">{{ icons.icon('target',18) }}</span><span>Get matched to vacancies by skill</span></div>
+        <div class="auth-feature-item"><span class="ico">{{ icons.icon('file',18) }}</span><span>Upload your resume once, use it everywhere</span></div>
+        <div class="auth-feature-item"><span class="ico">{{ icons.icon('clipboard',18) }}</span><span>Track every application in real time</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-form-box">
+      <div class="auth-head">
+        <h1>Create your account</h1>
+        <p>Join CareerHub as a student or job seeker — it's free.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('student_register') }}" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="full_name">Full Name</label>
+          <div class="input-wrap">
+            <span class="input-icon">{{ icons.icon('user',17) }}</span>
+            <input class="form-control has-icon" type="text" id="full_name" name="full_name" placeholder="Ram Prasad Sharma" value="{{ full_name or '' }}" required autofocus>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">{{ icons.icon('mail',17) }}</span>
+            <input class="form-control has-icon" type="email" id="email" name="email" placeholder="you@example.com" value="{{ email or '' }}" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="password-field">
+              <input class="form-control" type="password" id="password" name="password" placeholder="At least 6 characters" required minlength="6">
+              <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Show password">
+                {{ icons.icon('eye',17) }}{{ icons.icon('eye-off',17) }}
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="confirm_password">Confirm Password</label>
+            <div class="password-field">
+              <input class="form-control" type="password" id="confirm_password" name="confirm_password" placeholder="Repeat password" required minlength="6">
+              <button type="button" class="password-toggle" data-password-toggle="confirm_password" aria-label="Show password">
+                {{ icons.icon('eye',17) }}{{ icons.icon('eye-off',17) }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">{{ icons.icon('arrow-right',18) }} Create Account</button>
+      </form>
+
+      <div class="auth-switch">Already have an account? <a href="{{ url_for('student_login') }}">Log in</a></div>
+      <div class="auth-divider">or</div>
+      <a href="{{ url_for('org_register') }}" class="auth-alt-role">{{ icons.icon('building',17) }} Register as an Organization instead</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

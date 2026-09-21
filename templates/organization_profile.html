@@ -1,0 +1,70 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Organization Profile — CareerHub{% endblock %}
+{% block app_content %}
+
+<div class="profile-header-banner animate-in">
+  <div class="profile-avatar">{{ org.organization_name[0].upper() }}</div>
+  <div>
+    <h1>{{ org.organization_name }}</h1>
+    <p>{{ org.email }} &middot; Member since {{ org.created_at.strftime('%B %Y') }}</p>
+  </div>
+  <div style="margin-left:auto;">
+    <span class="verif-badge {{ org.verification_status }}" style="font-size:.8rem; padding:8px 16px;">{{ org.verification_status }}</span>
+  </div>
+</div>
+
+{% if org.verification_status == 'Rejected' and org.verification_note %}
+  <div class="expired-banner mb-3">{{ icons.icon('alert',17) }} Admin note: {{ org.verification_note }}</div>
+{% endif %}
+
+<div class="cards-grid" style="grid-template-columns: 2fr 1fr; align-items:start;">
+  <form method="POST" action="{{ url_for('org_profile') }}" class="card" data-reveal novalidate>
+    <h3 style="font-size:1rem; margin-bottom:20px;">Organization Details</h3>
+    <div class="form-group">
+      <label class="form-label" for="organization_name">Organization Name</label>
+      <input class="form-control" type="text" id="organization_name" name="organization_name" value="{{ org.organization_name }}" required>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone</label>
+        <input class="form-control" type="text" id="phone" name="phone" value="{{ org.phone or '' }}" placeholder="+1 555 000 1234">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="address">Address</label>
+        <input class="form-control" type="text" id="address" name="address" value="{{ org.address or '' }}" placeholder="City, Country">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="description">Description</label>
+      <textarea class="form-control" id="description" name="description" rows="5" placeholder="Tell candidates about your organization...">{{ org.description or '' }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg mt-2">{{ icons.icon('check',17) }} Save Changes</button>
+  </form>
+
+  <div>
+    <div class="card mb-3" data-reveal data-reveal-delay="2">
+      <h3 style="font-size:.95rem; margin-bottom:14px;">Organization Stats</h3>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="flex-between"><span class="field-label" style="text-transform:none; font-size:.85rem; color:var(--text-muted);">Active Vacancies</span><strong>{{ org.opportunities|length }}</strong></div>
+        <div class="flex-between"><span class="field-label" style="text-transform:none; font-size:.85rem; color:var(--text-muted);">Total Applications</span>
+          <strong>{% set total = namespace(v=0) %}{% for o in org.opportunities %}{% set total.v = total.v + o.applications|length %}{% endfor %}{{ total.v }}</strong>
+        </div>
+      </div>
+    </div>
+    <div class="card" data-reveal data-reveal-delay="3">
+      <h3 style="font-size:.95rem; margin-bottom:10px;">{{ icons.icon('info',16) }} Verification Status</h3>
+      <p style="font-size:.84rem; margin-bottom:10px;">
+        {% if org.verification_status == 'Verified' %}
+          Your organization is verified and can post vacancies.
+        {% elif org.verification_status == 'Pending' %}
+          Your registration is awaiting admin review before you can post vacancies.
+        {% else %}
+          Your registration was rejected. Please review your details or reach out to the admin team.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
