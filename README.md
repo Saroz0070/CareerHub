@@ -159,12 +159,10 @@ All configuration lives in `config.py` and can be overridden with environment va
 ```bash
 export SECRET_KEY="change-me-in-production"
 export DATABASE_URL="mysql+pymysql://user:pass@localhost:3306/careerhub"   # or leave unset for SQLite
-export ADMIN_EMAIL="admin@careerhub.com"
-export ADMIN_PASSWORD="choose-a-strong-password"
-
+export ADMIN_EMAIL="your-admin-email"
+export ADMIN_PASSWORD="your-strong-password"
 # Optional Gmail SMTP — applications submit fine without this
-export MAIL_USERNAME="yourapp@gmail.com"
-export MAIL_PASSWORD="your-gmail-app-password"
+
 ```
 
 Email is only sent if `MAIL_USERNAME` and `MAIL_PASSWORD` are both set; a failed send never blocks an application.
