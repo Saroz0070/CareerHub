@@ -136,6 +136,7 @@ Then open **http://127.0.0.1:5000**
 Go to the footer link Admin Portal (or /admin/login) and sign in using the administrator credentials configured through environment variables:
 
 ADMIN_EMAIL
+
 ADMIN_PASSWORD
 
 Set these environment variables before running the application. Do not commit administrator credentials to the repository.
