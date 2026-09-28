@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}CareerHub — Build Your Career. Discover Your Opportunity.{% endblock %}
+
+{% block content %}
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="bg-decor">
+    <div class="grid-pattern"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+  <div class="hero-inner">
+    <div data-reveal>
+      <span class="hero-badge">{{ icons.icon('sparkle', 15) }} Where careers begin</span>
+      <h1>Build Your Career.<br><span class="grad-text">Discover Your Opportunity.</span></h1>
+      <p class="lead">CareerHub connects driven students and job seekers with organizations offering real internships and jobs — powered by skills-based matching, a clean application process, and honest tracking every step of the way.</p>
+      <div class="hero-cta">
+        {% if session.get('role') == 'student' %}
+          <a href="{{ url_for('opportunities') }}" class="btn btn-primary btn-lg">{{ icons.icon('briefcase',18) }} Explore Opportunities</a>
+          <a href="{{ url_for('student_dashboard') }}" class="btn btn-outline btn-lg">Go to Dashboard</a>
+        {% elif session.get('role') == 'org' %}
+          <a href="{{ url_for('post_opportunity') }}" class="btn btn-primary btn-lg">{{ icons.icon('plus',18) }} Post a Vacancy</a>
+          <a href="{{ url_for('org_dashboard') }}" class="btn btn-outline btn-lg">Go to Dashboard</a>
+        {% else %}
+          <a href="{{ url_for('student_register') }}" class="btn btn-primary btn-lg">{{ icons.icon('arrow-right',18) }} Create Account</a>
+          <a href="{{ url_for('student_login') }}" class="btn btn-outline btn-lg">{{ icons.icon('briefcase',18) }} Explore Opportunities</a>
+        {% endif %}
+      </div>
+      <div class="hero-trust">
+        <span class="hero-trust-item">{{ icons.icon('check-circle',16) }} Free for students</span>
+        <span class="hero-trust-item">{{ icons.icon('shield',16) }} Verified organizations</span>
+        <span class="hero-trust-item">{{ icons.icon('target',16) }} Smart skill matching</span>
+      </div>
+    </div>
+
+    <div class="hero-visual" data-reveal data-reveal-delay="2">
+      <div class="hero-visual-card main">
+        <div class="vcard-row">
+          <div class="vcard-avatar"></div>
+          <div style="flex:1;">
+            <div class="vcard-line w-60"></div>
+            <div class="vcard-line w-40" style="margin-bottom:0;"></div>
+          </div>
+        </div>
+        <div class="vcard-line w-80"></div>
+        <div class="vcard-line w-60" style="margin-bottom:0;"></div>
+        <div class="vcard-chip-row">
+          <span class="vcard-chip">Python</span>
+          <span class="vcard-chip">SQL</span>
+          <span class="vcard-chip">UI/UX</span>
+        </div>
+      </div>
+      <div class="hero-visual-card mini-1">
+        <div class="vcard-stat">
+          <div class="vcard-stat-icon">{{ icons.icon('check-circle',18) }}</div>
+          <div>
+            <div class="vcard-stat-num">{{ stats.applications }}</div>
+            <div style="font-size:.72rem; color:var(--text-faint); font-weight:600;">Applications sent</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual-card mini-2">
+        <div style="font-size:.76rem; font-weight:700; color:var(--text-muted); margin-bottom:8px;">Profile match</div>
+        <div class="vcard-progress"><div class="vcard-progress-fill" style="width:87%;"></div></div>
+        <div style="text-align:right; font-weight:800; font-family:var(--font-display); margin-top:6px; color:var(--indigo-600);">87%</div>
+      </div>
+      <div class="hero-visual-card mini-3">
+        <div class="vcard-row" style="margin-bottom:8px;">
+          <div class="vcard-avatar" style="width:28px;height:28px;border-radius:8px;"></div>
+          <div class="vcard-line w-60" style="margin-bottom:0;"></div>
+        </div>
+        <span class="badge badge-success">{{ icons.icon('check',12) }} Accepted</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS (dark) ============ -->
+<section class="section-dark" style="padding: 54px 0;">
+  <div class="bg-decor"><div class="blob blob-1" style="opacity:.25;"></div></div>
+  <div class="stats-strip" data-reveal>
+    <div class="stat-item"><div class="stat-num">{{ stats.students }}+</div><div class="stat-label">Students Registered</div></div>
+    <div class="stat-item"><div class="stat-num">{{ stats.organizations }}+</div><div class="stat-label">Verified Organizations</div></div>
+    <div class="stat-item"><div class="stat-num">{{ stats.opportunities }}+</div><div class="stat-label">Open Opportunities</div></div>
+    <div class="stat-item"><div class="stat-num">{{ stats.applications }}+</div><div class="stat-label">Applications Submitted</div></div>
+  </div>
+</section>
+
+<!-- ============ PLATFORM BENEFITS ============ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <span class="page-eyebrow">{{ icons.icon('sparkle',14) }} Why CareerHub</span>
+      <h2>Everything you need for the next step</h2>
+      <p>A focused platform built around one goal: connecting the right people with the right opportunities, without the noise.</p>
+    </div>
+    <div class="cards-grid cards-grid-4">
+      <div class="feature-card" data-reveal data-reveal-delay="1">
+        <div class="feature-icon">{{ icons.icon('target',24) }}</div>
+        <h3>Skill-Based Matching</h3>
+        <p>Vacancies are scored against your profile so you see the opportunities you're actually a fit for first.</p>
+      </div>
+      <div class="feature-card" data-reveal data-reveal-delay="2">
+        <div class="feature-icon">{{ icons.icon('shield',24) }}</div>
+        <h3>Verified Organizations</h3>
+        <p>Every employer is reviewed before they can post, so listings stay genuine and trustworthy.</p>
+      </div>
+      <div class="feature-card" data-reveal data-reveal-delay="3">
+        <div class="feature-icon">{{ icons.icon('clipboard',24) }}</div>
+        <h3>Track Every Application</h3>
+        <p>See exactly where you stand — pending, shortlisted, accepted or rejected — all in one place.</p>
+      </div>
+      <div class="feature-card" data-reveal data-reveal-delay="4">
+        <div class="feature-icon">{{ icons.icon('user',24) }}</div>
+        <h3>A Profile That Works</h3>
+        <p>Build a complete profile once — skills, education, resume — and apply everywhere in a click.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section" style="background: var(--bg-alt);">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <span class="page-eyebrow">{{ icons.icon('sparkle',14) }} Simple by design</span>
+      <h2>How CareerHub works</h2>
+      <p>Four steps between you and your next opportunity.</p>
+    </div>
+    <div class="how-steps">
+      <div class="step-card" data-reveal data-reveal-delay="1">
+        <div class="step-number">1</div>
+        <h3>Create your account</h3>
+        <p>Register as a student or an organization in under a minute.</p>
+      </div>
+      <div class="step-card" data-reveal data-reveal-delay="2">
+        <div class="step-number">2</div>
+        <h3>Complete your profile</h3>
+        <p>Add skills, education and a resume — or post your first vacancy.</p>
+      </div>
+      <div class="step-card" data-reveal data-reveal-delay="3">
+        <div class="step-number">3</div>
+        <h3>Match & apply</h3>
+        <p>Browse recommended vacancies or review matched applicants.</p>
+      </div>
+      <div class="step-card" data-reveal data-reveal-delay="4">
+        <div class="step-number">4</div>
+        <h3>Track the outcome</h3>
+        <p>Follow every application through to a decision — no guessing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AUDIENCE SPLIT ============ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <span class="page-eyebrow">{{ icons.icon('users',14) }} Built for both sides</span>
+      <h2>Whichever side you're on, we've got you</h2>
+    </div>
+    <div class="audience-split">
+      <div class="audience-card student" data-reveal>
+        <div class="feature-icon">{{ icons.icon('user',24) }}</div>
+        <h3>For Students &amp; Job Seekers</h3>
+        <p>Find opportunities that actually match your skills — and apply with confidence.</p>
+        <ul class="audience-list">
+          <li>{{ icons.icon('check',16) }} Personalized match scores on every vacancy</li>
+          <li>{{ icons.icon('check',16) }} One profile, one resume, apply anywhere</li>
+          <li>{{ icons.icon('check',16) }} Full visibility into application status</li>
+        </ul>
+        <a href="{{ url_for('student_register') }}" class="btn btn-primary">Join as a Student {{ icons.icon('arrow-right',16) }}</a>
+      </div>
+      <div class="audience-card org" data-reveal data-reveal-delay="2">
+        <div class="feature-icon" style="background: linear-gradient(135deg, var(--teal-500), var(--indigo-500));">{{ icons.icon('building',24) }}</div>
+        <h3>For Organizations</h3>
+        <p>Post vacancies and review a shortlist of well-matched, genuine candidates.</p>
+        <ul class="audience-list">
+          <li>{{ icons.icon('check',16) }} Verified badge builds applicant trust</li>
+          <li>{{ icons.icon('check',16) }} Manage every vacancy from one dashboard</li>
+          <li>{{ icons.icon('check',16) }} Review applicant resumes &amp; profiles directly</li>
+        </ul>
+        <a href="{{ url_for('org_register') }}" class="btn btn-primary">Register Your Organization {{ icons.icon('arrow-right',16) }}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if latest_opps %}
+<!-- ============ LATEST OPPORTUNITIES PREVIEW ============ -->
+<section class="section" style="background: var(--bg-alt);">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <span class="page-eyebrow">{{ icons.icon('briefcase',14) }} Fresh listings</span>
+      <h2>Recently posted opportunities</h2>
+      <p>A glimpse of what's live on CareerHub right now.</p>
+    </div>
+    <div class="cards-grid cards-grid-3">
+      {% for opp in latest_opps %}
+        <div class="opp-card card card-hover" data-reveal data-reveal-delay="{{ loop.index }}">
+          <div class="opp-card-top">
+            <span class="badge badge-type">{{ opp.opportunity_type }}</span>
+          </div>
+          <h3 class="opp-title">{{ opp.title }}</h3>
+          <p class="opp-org">{{ icons.icon('building',15) }} {{ opp.organization.organization_name }}</p>
+          <p class="opp-meta">{{ icons.icon('location',15) }} {{ opp.location or 'Location flexible' }}</p>
+          {% if opp.deadline %}
+            <p class="opp-meta">{{ icons.icon('calendar',15) }} Apply by {{ opp.deadline.strftime('%d %b %Y') }}</p>
+          {% endif %}
+          <div class="opp-card-footer">
+            <a href="{{ url_for('student_login') }}" class="btn btn-outline btn-sm">Sign in to View</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ============ CTA ============ -->
+<section class="section" style="padding-top: 0;">
+  <div class="cta-section" data-reveal>
+    <div class="bg-decor"><div class="blob blob-2" style="opacity:.3;"></div></div>
+    <h2>Ready to take the next step?</h2>
+    <p>Join CareerHub today — it's free for students and takes less than a minute to get started.</p>
+    <div class="cta-buttons">
+      <a href="{{ url_for('student_register') }}" class="btn btn-light btn-lg">{{ icons.icon('user',18) }} Join as a Student</a>
+      <a href="{{ url_for('org_register') }}" class="btn btn-outline btn-lg" style="background:transparent; border-color:rgba(255,255,255,.35); color:#fff;">{{ icons.icon('building',18) }} Register Organization</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

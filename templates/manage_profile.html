@@ -1,0 +1,156 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Edit Profile — CareerHub{% endblock %}
+{% block app_content %}
+
+<div class="app-topbar">
+  <div class="app-topbar-title">
+    <span class="page-eyebrow">{{ icons.icon('edit',14) }} Profile Settings</span>
+    <h1>Edit Your Profile</h1>
+    <p>Keep your details up to date for better vacancy matches.</p>
+  </div>
+  <a href="{{ url_for('student_profile') }}" class="btn btn-outline btn-sm">{{ icons.icon('chevron-left',15) }} Back to Profile</a>
+</div>
+
+<div class="cards-grid" style="grid-template-columns: 2fr 1fr; align-items:start;">
+  <form method="POST" action="{{ url_for('manage_profile') }}" enctype="multipart/form-data" class="card" data-reveal novalidate id="profile-form">
+    <input type="hidden" name="action" value="update">
+    <h3 style="font-size:1rem; margin-bottom:20px;">Basic Information</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="full_name">Full Name</label>
+        <input class="form-control" type="text" id="full_name" name="full_name" value="{{ student.full_name }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone</label>
+        <input class="form-control" type="text" id="phone" name="phone" value="{{ student.phone or '' }}" placeholder="+977 9841234567">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="address">Address</label>
+      <input class="form-control" type="text" id="address" name="address" value="{{ student.address or '' }}" placeholder="Baneshwor, Kathmandu, Nepal">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="education">Education</label>
+      <input class="form-control" type="text" id="education" name="education" value="{{ student.education or '' }}" placeholder="BCA, Tribhuvan University">
+    </div>
+
+    <hr class="divider">
+    <h3 style="font-size:1rem; margin-bottom:8px;">Skills &amp; Interests</h3>
+    <p class="form-hint" style="margin-bottom:16px;">Separate each item with a comma — these power your vacancy match score.</p>
+    <div class="form-group">
+      <label class="form-label" for="skills">Skills</label>
+      <input class="form-control" type="text" id="skills" name="skills" value="{{ student.skills or '' }}" placeholder="Python, SQL, Communication" data-chip-preview="skills-preview">
+      <div class="chip-preview" id="skills-preview"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="interests">Interests</label>
+      <input class="form-control" type="text" id="interests" name="interests" value="{{ student.interests or '' }}" placeholder="Data Science, Design" data-chip-preview="interests-preview">
+      <div class="chip-preview" id="interests-preview"></div>
+    </div>
+
+    <hr class="divider">
+    <h3 style="font-size:1rem; margin-bottom:12px;">Resume</h3>
+    <div class="form-group">
+      <label class="file-drop {{ 'has-file' if student.resume }}">
+        <span class="file-drop-icon">{{ icons.icon('upload',20) }}</span>
+        <span class="file-drop-text">
+          <span class="file-drop-filename">{{ 'Replace current resume' if student.resume else 'Click to upload your resume (PDF, DOC, DOCX)' }}</span>
+        </span>
+        <input class="file-input" type="file" name="resume" accept=".pdf,.doc,.docx">
+      </label>
+    </div>
+
+  </form>
+
+  <div>
+    <div class="card mb-3" data-reveal data-reveal-delay="2">
+      <h3 style="font-size:.95rem; margin-bottom:10px;">{{ icons.icon('info',16) }} Tips</h3>
+      <p style="font-size:.84rem; line-height:1.6;">A complete profile with skills and a resume dramatically improves your match score and visibility to organizations reviewing applicants.</p>
+    </div>
+    <div class="card" style="border-color:#f3c7cb;" data-reveal data-reveal-delay="3">
+      <h3 style="font-size:.95rem; margin-bottom:10px; color:var(--danger);">{{ icons.icon('alert',16) }} Danger Zone</h3>
+      <p style="font-size:.84rem; margin-bottom:14px;">Deleting your account removes your profile and application history permanently. This cannot be undone.</p>
+      <form method="POST" action="{{ url_for('manage_profile') }}" data-confirm="This will permanently delete your account and all your applications. Are you sure?">
+        <input type="hidden" name="action" value="delete">
+        <button type="submit" class="btn btn-danger-outline btn-sm btn-block">{{ icons.icon('trash',15) }} Delete My Account</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3" data-reveal>
+  <h3 style="font-size:1rem; margin-bottom:8px;">{{ icons.icon('briefcase',18) }} Work Experience</h3>
+  <p class="form-hint" style="margin-bottom:20px;">Add each experience with its technology/field (e.g. Python — 1 year, Java — 3 years). Vacancy matching only counts experience in the technology a vacancy asks for.</p>
+
+  {% for e in student.experiences %}
+    <div class="card" style="margin-bottom:16px; box-shadow:none;">
+      <form method="POST" action="{{ url_for('edit_experience', experience_id=e.experience_id) }}" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="role-{{ e.experience_id }}">Job / Role</label>
+            <input class="form-control" type="text" id="role-{{ e.experience_id }}" name="role" value="{{ e.role }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="company-{{ e.experience_id }}">Company / Organization</label>
+            <input class="form-control" type="text" id="company-{{ e.experience_id }}" name="company" value="{{ e.company }}" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="technology-{{ e.experience_id }}">Technology / Field</label>
+            <input class="form-control" type="text" id="technology-{{ e.experience_id }}" name="technology" value="{{ e.technology }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="years-{{ e.experience_id }}">Years of Experience</label>
+            <input class="form-control" type="number" id="years-{{ e.experience_id }}" name="years" min="0" max="60" step="0.5" value="{{ '%g'|format(e.years or 0) }}" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="description-{{ e.experience_id }}">Description <span class="optional">(optional)</span></label>
+          <textarea class="form-control" id="description-{{ e.experience_id }}" name="description" rows="2">{{ e.description or '' }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">{{ icons.icon('check',15) }} Save</button>
+      </form>
+      <form method="POST" action="{{ url_for('delete_experience', experience_id=e.experience_id) }}" data-confirm="Delete this experience?" style="margin-top:8px;">
+        <button type="submit" class="btn btn-danger-outline btn-sm">{{ icons.icon('trash',15) }} Delete</button>
+      </form>
+    </div>
+  {% endfor %}
+
+  <hr class="divider">
+  <h3 style="font-size:.95rem; margin-bottom:14px;">Add an Experience</h3>
+  <form method="POST" action="{{ url_for('add_experience') }}" novalidate>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="new-role">Job / Role</label>
+        <input class="form-control" type="text" id="new-role" name="role" placeholder="Backend Developer" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="new-company">Company / Organization</label>
+        <input class="form-control" type="text" id="new-company" name="company" placeholder="Himalaya Tech Pvt. Ltd." required>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="new-technology">Technology / Field</label>
+        <input class="form-control" type="text" id="new-technology" name="technology" placeholder="Python" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="new-years">Years of Experience</label>
+        <input class="form-control" type="number" id="new-years" name="years" min="0" max="60" step="0.5" placeholder="1" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="new-description">Description <span class="optional">(optional)</span></label>
+      <textarea class="form-control" id="new-description" name="description" rows="2" placeholder="Developed Flask web applications."></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">{{ icons.icon('plus',16) }} Add Experience</button>
+  </form>
+</div>
+
+<div class="mt-3">
+  <button type="submit" form="profile-form" class="btn btn-primary btn-lg">{{ icons.icon('check',17) }} Save Changes</button>
+</div>
+
+{% endblock %}

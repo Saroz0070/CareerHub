@@ -1,0 +1,116 @@
+{% extends "app_base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Organization Dashboard — CareerHub{% endblock %}
+{% block app_content %}
+
+<div class="app-welcome-banner animate-in">
+  <div class="welcome-icon">{{ icons.icon('building', 80) }}</div>
+  <h1>Welcome back, {{ org.organization_name }} {{ icons.icon('sparkle',18) }}</h1>
+  <p>Here's an overview of your vacancies and applicants.</p>
+</div>
+
+{% if org.verification_status == 'Pending' %}
+  <div class="expired-banner" style="background: var(--warning-bg); color: var(--warning);">
+    {{ icons.icon('clock',18) }} Your organization is awaiting admin verification. You can explore your dashboard, but you can't post vacancies until you're verified.
+  </div>
+{% elif org.verification_status == 'Rejected' %}
+  <div class="expired-banner">
+    {{ icons.icon('x-circle',18) }} Your organization's verification was rejected{{ ': ' + org.verification_note if org.verification_note }}. Please update your profile or contact the admin team.
+  </div>
+{% endif %}
+
+<div class="stat-cards">
+  <div class="stat-card tone-indigo animate-in">
+    <div class="stat-card-top"><div class="stat-card-icon">{{ icons.icon('briefcase',20) }}</div></div>
+    <div class="stat-card-value">{{ vacancies_count }}</div>
+    <div class="stat-card-label">Total Vacancies</div>
+  </div>
+  <div class="stat-card tone-teal animate-in">
+    <div class="stat-card-top"><div class="stat-card-icon">{{ icons.icon('trending',20) }}</div></div>
+    <div class="stat-card-value">{{ active_count }}</div>
+    <div class="stat-card-label">Active Vacancies</div>
+  </div>
+  <div class="stat-card tone-warning animate-in">
+    <div class="stat-card-top"><div class="stat-card-icon">{{ icons.icon('clock',20) }}</div></div>
+    <div class="stat-card-value">{{ pending_count }}</div>
+    <div class="stat-card-label">Pending Applications</div>
+  </div>
+  <div class="stat-card tone-success animate-in">
+    <div class="stat-card-top"><div class="stat-card-icon">{{ icons.icon('check-circle',20) }}</div></div>
+    <div class="stat-card-value">{{ accepted_count }}</div>
+    <div class="stat-card-label">Accepted</div>
+  </div>
+</div>
+
+<div class="cards-grid" style="grid-template-columns: 2fr 1fr; align-items:start; margin-bottom: 32px;">
+  <div class="card" data-reveal>
+    <div class="flex-between mb-2">
+      <h3 style="font-size:1.05rem;">{{ icons.icon('users',18) }} Recent Applications</h3>
+      <a href="{{ url_for('org_applicants') }}" class="btn btn-ghost btn-sm">View All {{ icons.icon('chevron-right',14) }}</a>
+    </div>
+    {% if recent_apps %}
+      <div class="table-card" style="box-shadow:none; border-radius: var(--radius);">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead><tr><th>Applicant</th><th>Vacancy</th><th>Applied</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for a in recent_apps %}
+                <tr>
+                  <td data-label="Applicant" class="cell-strong">{{ a.student.full_name }}</td>
+                  <td data-label="Vacancy">{{ a.opportunity.title }}</td>
+                  <td data-label="Applied"><span class="cell-muted">{{ a.applied_at.strftime('%d %b %Y') }}</span></td>
+                  <td data-label="Status"><span class="badge badge-status badge-{{ a.status.lower() }}">{{ a.status }}</span></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% else %}
+      <div class="empty-state" style="padding: 40px 20px;">
+        <div class="empty-icon">{{ icons.icon('users',30) }}</div>
+        <h3>No applications yet</h3>
+        <p>Once candidates apply to your vacancies, they'll show up here.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="card" data-reveal data-reveal-delay="2">
+    <h3 style="font-size:1rem; margin-bottom:14px;">Quick Actions</h3>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      {% if org.verification_status == 'Verified' %}
+        <a href="{{ url_for('post_opportunity') }}" class="btn btn-primary btn-sm" style="justify-content:flex-start;">{{ icons.icon('plus',16) }} Post a Vacancy</a>
+      {% else %}
+        <span class="btn btn-disabled btn-sm" style="justify-content:flex-start;">{{ icons.icon('plus',16) }} Post a Vacancy (Verify First)</span>
+      {% endif %}
+      <a href="{{ url_for('manage_opportunities') }}" class="btn btn-ghost btn-sm" style="justify-content:flex-start;">{{ icons.icon('briefcase',16) }} Manage Vacancies</a>
+      <a href="{{ url_for('org_applicants') }}" class="btn btn-ghost btn-sm" style="justify-content:flex-start;">{{ icons.icon('users',16) }} View Applicants</a>
+      <a href="{{ url_for('org_profile') }}" class="btn btn-ghost btn-sm" style="justify-content:flex-start;">{{ icons.icon('building',16) }} Edit Organization Profile</a>
+    </div>
+    <hr class="divider">
+    <div class="flex gap-2" style="align-items:center;">
+      <span class="field-label">Verification</span>
+      <span class="verif-badge {{ org.verification_status }}">{{ org.verification_status }}</span>
+    </div>
+  </div>
+</div>
+
+{% if recent_vacancies %}
+<div class="card" data-reveal>
+  <div class="flex-between mb-2">
+    <h3 style="font-size:1.05rem;">{{ icons.icon('briefcase',18) }} Your Vacancies</h3>
+    <a href="{{ url_for('manage_opportunities') }}" class="btn btn-ghost btn-sm">Manage All {{ icons.icon('chevron-right',14) }}</a>
+  </div>
+  <div class="cards-grid cards-grid-4">
+    {% for v in recent_vacancies %}
+      <div class="opp-card card card-hover {{ 'opp-card-expired' if is_expired(v) }}">
+        <span class="badge badge-type">{{ v.opportunity_type }}</span>
+        <h3 class="opp-title" style="margin-top:10px;">{{ v.title }}</h3>
+        <p class="opp-meta">{{ icons.icon('clipboard',14) }} {{ v.applications|length }} applicant(s)</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

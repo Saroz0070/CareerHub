@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% import "_icons.html" as icons %}
+
+{% block content %}
+<div class="app-shell">
+  <div class="sidebar-overlay"></div>
+
+  <aside class="app-sidebar">
+    {% if session.get('role') == 'student' %}
+      <div class="sidebar-org-card">
+        <div class="flex gap-1" style="align-items:center;">
+          <span class="user-avatar">{{ session.get('name','S')[0]|upper }}</span>
+          <div style="min-width:0;">
+            <div style="font-weight:700; font-size:.86rem; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ session.get('name','Student') }}</div>
+            <div style="font-size:.72rem; color:var(--on-dark-muted);">Student account</div>
+          </div>
+        </div>
+      </div>
+      <p class="sidebar-section-label">Menu</p>
+      <nav class="sidebar-nav">
+        <a href="{{ url_for('student_dashboard') }}" class="{{ 'active' if request.endpoint == 'student_dashboard' }}">{{ icons.icon('dashboard',18) }} Dashboard</a>
+        <a href="{{ url_for('student_profile') }}" class="{{ 'active' if request.endpoint == 'student_profile' }}">{{ icons.icon('user',18) }} My Profile</a>
+        <a href="{{ url_for('manage_profile') }}" class="{{ 'active' if request.endpoint == 'manage_profile' }}">{{ icons.icon('edit',18) }} Edit Profile</a>
+        <a href="{{ url_for('opportunities') }}" class="{{ 'active' if request.endpoint in ['opportunities','opportunity_detail'] }}">{{ icons.icon('briefcase',18) }} Browse Vacancies</a>
+        <a href="{{ url_for('my_applications') }}" class="{{ 'active' if request.endpoint == 'my_applications' }}">{{ icons.icon('clipboard',18) }} My Applications</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <nav class="sidebar-nav">
+          <a href="{{ url_for('home') }}">{{ icons.icon('home',18) }} Back to Home</a>
+          <a href="{{ url_for('student_logout') }}">{{ icons.icon('logout',18) }} Logout</a>
+        </nav>
+      </div>
+
+    {% elif session.get('role') == 'org' %}
+      <div class="sidebar-org-card">
+        <div class="flex gap-1" style="align-items:center;">
+          <span class="user-avatar">{{ session.get('name','O')[0]|upper }}</span>
+          <div style="min-width:0;">
+            <div style="font-weight:700; font-size:.86rem; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ session.get('name','Organization') }}</div>
+            <div style="font-size:.72rem; color:var(--on-dark-muted);">Organization account</div>
+          </div>
+        </div>
+        {% if session.get('org_status') %}
+          <div class="verif-badge {{ session.get('org_status') }}">{{ session.get('org_status') }}</div>
+        {% endif %}
+      </div>
+      <p class="sidebar-section-label">Menu</p>
+      <nav class="sidebar-nav">
+        <a href="{{ url_for('org_dashboard') }}" class="{{ 'active' if request.endpoint == 'org_dashboard' }}">{{ icons.icon('dashboard',18) }} Dashboard</a>
+        <a href="{{ url_for('org_profile') }}" class="{{ 'active' if request.endpoint == 'org_profile' }}">{{ icons.icon('building',18) }} Organization Profile</a>
+        <a href="{{ url_for('post_opportunity') }}" class="{{ 'active' if request.endpoint == 'post_opportunity' }}">{{ icons.icon('plus',18) }} Post Vacancy</a>
+        <a href="{{ url_for('manage_opportunities') }}" class="{{ 'active' if request.endpoint in ['manage_opportunities','edit_opportunity'] }}">{{ icons.icon('briefcase',18) }} Manage Vacancies</a>
+        <a href="{{ url_for('org_applicants') }}" class="{{ 'active' if request.endpoint == 'org_applicants' }}">{{ icons.icon('users',18) }} Applicants</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <nav class="sidebar-nav">
+          <a href="{{ url_for('home') }}">{{ icons.icon('home',18) }} Back to Home</a>
+          <a href="{{ url_for('org_logout') }}">{{ icons.icon('logout',18) }} Logout</a>
+        </nav>
+      </div>
+
+    {% elif session.get('role') == 'admin' %}
+      <div class="sidebar-org-card">
+        <div class="flex gap-1" style="align-items:center;">
+          <span class="user-avatar">A</span>
+          <div>
+            <div style="font-weight:700; font-size:.86rem; color:#fff;">Admin</div>
+            <div style="font-size:.72rem; color:var(--on-dark-muted);">Administrator</div>
+          </div>
+        </div>
+      </div>
+      <p class="sidebar-section-label">Menu</p>
+      <nav class="sidebar-nav">
+        <a href="{{ url_for('admin_dashboard') }}" class="{{ 'active' if request.endpoint == 'admin_dashboard' }}">{{ icons.icon('dashboard',18) }} Dashboard</a>
+        <a href="{{ url_for('admin_organizations') }}" class="{{ 'active' if request.endpoint in ['admin_organizations','admin_org_detail'] }}">{{ icons.icon('building',18) }} Organizations</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <nav class="sidebar-nav">
+          <a href="{{ url_for('home') }}">{{ icons.icon('home',18) }} Back to Home</a>
+          <a href="{{ url_for('admin_logout') }}">{{ icons.icon('logout',18) }} Logout</a>
+        </nav>
+      </div>
+    {% endif %}
+  </aside>
+
+  <div class="app-main">
+    <button type="button" class="sidebar-toggle">{{ icons.icon('menu',16) }} Menu</button>
+    {% block app_content %}{% endblock %}
+  </div>
+</div>
+{% endblock %}
