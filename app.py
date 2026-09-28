@@ -61,41 +61,83 @@ def save_upload(file, subfolder=''):
 def match_percentage(student, opportunity):
     """
     Skills: 70 points  — matched required skills / total required
-    Experience: 30 points — technology/field specific. For each technology the
-    vacancy requires (its required skills), only the student's experience
-    records in that same technology count, capped at the required years.
-    Full 30 if the vacancy requires no experience.
+    Experience: 30 points — technology/field specific.
     """
     skill_score = 0
     exp_score = 0
 
     # Skills
-    student_skills = [s.strip().lower() for s in (student.skills or '').split(',') if s.strip()]
-    required_skills = [s.strip().lower() for s in (opportunity.required_skills or '').split(',') if s.strip()]
+    student_skills = [
+        s.strip().lower()
+        for s in (student.skills or '').split(',')
+        if s.strip()
+    ]
+
+    required_skills = [
+        s.strip().lower()
+        for s in (opportunity.required_skills or '').split(',')
+        if s.strip()
+    ]
 
     if student_skills and required_skills:
-        matched = sum(1 for r in required_skills if r in student_skills)
+        matched = sum(
+            1 for r in required_skills
+            if r in student_skills
+        )
         skill_score = (matched / len(required_skills)) * 70
-    # else 0
 
-    # Experience (technology/field specific)
+    # Experience
     req_exp = opportunity.experience_required or 0
+
     if req_exp <= 0:
         exp_score = 30
+
     else:
-        # years per technology — each record stays tied to its own technology
         exp_by_tech = {}
+
         for e in (student.experiences or []):
             key = (e.technology or '').strip().lower()
-            if key:
-                exp_by_tech[key] = exp_by_tech.get(key, 0) + (e.years or 0)
 
-                if required_skills:
-                   best = max(exp_by_tech.get(r, 0) for r in required_skills)
-                   exp_score = min(best / req_exp, 1.0) * 30
+            if key:
+                exp_by_tech[key] = (
+                    exp_by_tech.get(key, 0) + (e.years or 0)
+                )
+
+        if required_skills:
+            relevant_experience = 0
+
+            for required_skill in required_skills:
+                required_skill = required_skill.strip().lower()
+
+                if required_skill in exp_by_tech:
+                    relevant_experience = max(
+                        relevant_experience,
+                        exp_by_tech[required_skill]
+                    )
+
                 else:
-           
-            exp_score = min(sum(exp_by_tech.values()) / req_exp, 1.0) * 30
+                    for technology, years in exp_by_tech.items():
+                        if (
+                            required_skill in technology
+                            or technology in required_skill
+                        ):
+                            relevant_experience = max(
+                                relevant_experience,
+                                years
+                            )
+
+            if relevant_experience >= req_exp:
+                exp_score = 30
+            else:
+                exp_score = (
+                    relevant_experience / req_exp
+                ) * 30
+
+        else:
+            exp_score = min(
+                sum(exp_by_tech.values()) / req_exp,
+                1.0
+            ) * 30
 
     total = round(skill_score + exp_score)
     return total
@@ -236,47 +278,105 @@ def student_logout():
 @login_required_student
 def student_dashboard():
     student = Student.query.get_or_404(session['student_id'])
-    all_opps = Opportunity.query.order_by(Opportunity.created_at.desc()).all()
+    all_opps = Opportunity.query.order_by(
+        Opportunity.created_at.desc()
+    ).all()
 
     # Recommended: match >= 50, top 4
     recommended = []
+
     for opp in all_opps:
+
+        # Check minimum experience requirement
+        req_exp = opp.experience_required or 0
+
+        # Find student's relevant experience
+        student_experience = 0
+
+        required_skills = [
+            s.strip().lower()
+            for s in (opp.required_skills or '').split(',')
+            if s.strip()
+        ]
+
+        for experience in (student.experiences or []):
+            technology = (experience.technology or '').strip().lower()
+
+            if not technology:
+                continue
+
+            for required_skill in required_skills:
+                if (
+                    technology == required_skill
+                    or technology in required_skill
+                    or required_skill in technology
+                ):
+                    student_experience = max(
+                        student_experience,
+                        experience.years or 0
+                    )
+
+        # If company requires experience and student does not
+        # meet the minimum, do NOT recommend this vacancy.
+        if req_exp > 0 and student_experience < req_exp:
+            continue
+
+        # Calculate match percentage only after eligibility check
         pct = match_percentage(student, opp)
+
         if pct >= 50:
             recommended.append((opp, pct))
+
     recommended.sort(key=lambda x: x[1], reverse=True)
+
     recommended = recommended[:4]
 
     # Latest 6
     latest = all_opps[:6]
 
     # Applications
-    apps = (Application.query
-            .filter_by(student_id=student.student_id)
-            .order_by(Application.applied_at.desc())
-            .all())
+    apps = (
+        Application.query
+        .filter_by(student_id=student.student_id)
+        .order_by(Application.applied_at.desc())
+        .all()
+    )
 
     completion = profile_completion(student)
 
     # Build match map for latest
-    latest_match = {opp.opportunity_id: match_percentage(student, opp) for opp in latest}
-    applied_ids  = {a.opportunity_id for a in apps}
+    latest_match = {
+        opp.opportunity_id: match_percentage(student, opp)
+        for opp in latest
+    }
 
-    pending_count  = sum(1 for a in apps if a.status == 'Pending')
-    accepted_count = sum(1 for a in apps if a.status == 'Accepted')
-    rejected_count = sum(1 for a in apps if a.status == 'Rejected')
+    applied_ids = {a.opportunity_id for a in apps}
 
-    return render_template('dashboard.html',
-                           student=student,
-                           recommended=recommended,
-                           latest=latest,
-                           latest_match=latest_match,
-                           applications=apps,
-                           applied_ids=applied_ids,
-                           completion=completion,
-                           pending_count=pending_count,
-                           accepted_count=accepted_count,
-                           rejected_count=rejected_count)
+    pending_count = sum(
+        1 for a in apps if a.status == 'Pending'
+    )
+
+    accepted_count = sum(
+        1 for a in apps if a.status == 'Accepted'
+    )
+
+    rejected_count = sum(
+        1 for a in apps if a.status == 'Rejected'
+    )
+
+    return render_template(
+        'dashboard.html',
+        student=student,
+        recommended=recommended,
+        latest=latest,
+        latest_match=latest_match,
+        applications=apps,
+        applied_ids=applied_ids,
+        completion=completion,
+        pending_count=pending_count,
+        accepted_count=accepted_count,
+        rejected_count=rejected_count
+    )
 
 
 @app.route('/profile')
