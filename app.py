@@ -94,7 +94,6 @@ def match_percentage(student, opportunity):
                    best = max(exp_by_tech.get(r, 0) for r in required_skills)
                    exp_score = min(best / req_exp, 1.0) * 30
                 else:
-            else:
            
             exp_score = min(sum(exp_by_tech.values()) / req_exp, 1.0) * 30
 
