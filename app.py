@@ -14,7 +14,8 @@ from models.organization import Organization
 from models.opportunity import Opportunity
 from models.application import Application
 from models.experience import Experience
-
+from dotenv import load_dotenv
+load_dotenv()
 # App factory
 
 def create_app():
