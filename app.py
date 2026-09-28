@@ -90,12 +90,12 @@ def match_percentage(student, opportunity):
             if key:
                 exp_by_tech[key] = exp_by_tech.get(key, 0) + (e.years or 0)
 
-        if required_skills:
-            ratios = [min(exp_by_tech.get(r, 0) / req_exp, 1.0) for r in required_skills]
-            exp_score = (sum(ratios) / len(ratios)) * 30
-        else:
-            # vacancy names no technology -> nothing to match against;
-            # use the student's total recorded experience
+                if required_skills:
+                   best = max(exp_by_tech.get(r, 0) for r in required_skills)
+                   exp_score = min(best / req_exp, 1.0) * 30
+                else:
+            else:
+           
             exp_score = min(sum(exp_by_tech.values()) / req_exp, 1.0) * 30
 
     total = round(skill_score + exp_score)
